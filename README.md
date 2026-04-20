@@ -8,9 +8,8 @@ Tampermonkey 脚本源码库 - 可维护、可版本管理、可同步
 tampermonkey-scripts/
 ├── scripts/               # 脚本源码（核心开发）
 │   ├── reading/          # 阅读类脚本
-│   │   └── reader-enhancer/
-│   │       ├── index.user.js      # 入口脚本
-│   │       └── AutoScroll*.js     # 自动滚动
+│   │   ├── reader-enhancer/  # 阅读增强
+│   │   └── auto-scroll/     # 自动滚动
 │   ├── video/            # 视频类脚本
 │   │   └── video-downloader/
 │   └── common/           # 通用工具库（待建设）
@@ -31,6 +30,9 @@ tampermonkey-scripts/
 - 字体/宽度调整
 - 章节缓存
 - 导出 md/txt
+
+### reading/auto-scroll
+自动滚动脚本 - 页面自动滚动阅读
 
 ### video/video-downloader
 视频下载工具
