@@ -14,4 +14,3 @@
 ## 文件
 
 - `index.user.js` - 主脚本
-- `AutoScroll*.js` - 自动滚动模块
