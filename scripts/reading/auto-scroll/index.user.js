@@ -1,7 +1,8 @@
 // ==UserScript==
 // @name         AutoScroll Ultimate
 // @namespace    https://greasyfork.org/
-// @version      2026.04.19.2
+// @version      2026.04.21.1
+// @updateURL    https://raw.githubusercontent.com/ldypku/tampermonkey-scripts/main/dist/auto-scroll.user.js
 // @description  双击切换自动滚屏，支持控制面板/调速/方向/容器识别/站点配置记忆/切标签暂停恢复
 // @author       OpenAI
 // @match        http*://*/*
@@ -27,7 +28,7 @@
     boostMultiplier: 2.5,
     showIndicator: true,
     useSmartContainer: true,
-    buttonCollapsed: false,
+    showFloatingButton: false,
     panelCollapsed: false,
     fineTuneStep: 0.2,
     wheelTuneStep: 0.2,
@@ -85,10 +86,17 @@
 
   function loadSiteConfig() {
     const all = loadAllConfig();
-    return {
+    const cfg = {
       ...DEFAULT_CONFIG,
       ...(all[state.siteKey] || {})
     };
+
+    // 兼容旧字段
+    if (typeof cfg.showFloatingButton !== 'boolean') {
+      cfg.showFloatingButton = false;
+    }
+
+    return cfg;
   }
 
   function persistSiteConfig() {
@@ -447,6 +455,10 @@
       <div style="${sectionStyle()}">
         <div style="${labelStyle()}">选项</div>
         <label style="${checkRowStyle()}">
+          <input id="${APP_ID}-show-button" type="checkbox" />
+          <span>显示右上角按钮</span>
+        </label>
+        <label style="${checkRowStyle()}">
           <input id="${APP_ID}-smart" type="checkbox" />
           <span>自动识别滚动容器</span>
         </label>
@@ -477,11 +489,13 @@
     els.container = panel.querySelector(`#${APP_ID}-container`);
     els.speed = panel.querySelector(`#${APP_ID}-speed`);
     els.speedValue = panel.querySelector(`#${APP_ID}-speed-value`);
+    els.showButton = panel.querySelector(`#${APP_ID}-show-button`);
     els.smart = panel.querySelector(`#${APP_ID}-smart`);
     els.indicator = panel.querySelector(`#${APP_ID}-indicator`);
 
     panel.addEventListener('click', onPanelClick);
     els.speed.addEventListener('input', onSpeedInput);
+    els.showButton.addEventListener('change', onCheckboxChange);
     els.smart.addEventListener('change', onCheckboxChange);
     els.indicator.addEventListener('change', onCheckboxChange);
   }
@@ -555,11 +569,13 @@
     button.style.background = state.running
       ? 'rgba(32,136,74,0.92)'
       : 'rgba(20,20,20,0.88)';
+    button.style.display = state.config.showFloatingButton ? 'flex' : 'none';
 
     els.status.textContent = `${state.running ? '运行中' : '已停止'} ｜ ${formatDirection(state.config.direction)} ｜ ${effectiveSpeed}`;
     els.container.textContent = getContainerLabel(container);
     els.speed.value = String(state.config.speed);
     els.speedValue.textContent = `${round(state.config.speed, 1)}${state.boost ? `（加速 x${state.config.boostMultiplier}）` : ''}`;
+    els.showButton.checked = !!state.config.showFloatingButton;
     els.smart.checked = !!state.config.useSmartContainer;
     els.indicator.checked = !!state.config.showIndicator;
 
@@ -637,8 +653,14 @@
   }
 
   function onCheckboxChange() {
+    state.config.showFloatingButton = !!els.showButton.checked;
     state.config.useSmartContainer = !!els.smart.checked;
     state.config.showIndicator = !!els.indicator.checked;
+
+    if (button) {
+      button.style.display = state.config.showFloatingButton ? 'flex' : 'none';
+    }
+
     state.scrollEl = null;
     persistSiteConfig();
     getScrollElement(true);
@@ -851,6 +873,11 @@
     if (state.config.panelCollapsed) {
       setPanelCollapsed(true);
     }
+
+    if (button) {
+      button.style.display = state.config.showFloatingButton ? 'flex' : 'none';
+    }
+
     render();
   }
 

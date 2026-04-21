@@ -2,6 +2,7 @@
 // @name         Universal Reader Lite Ultimate Sequential Cache
 // @namespace    https://greasyfork.org/
 // @version      2026.04.19.10
+// @updateURL   https://raw.githubusercontent.com/ldypku/tampermonkey-scripts/main/dist/reader-enhancer.user.js
 // @description  通用阅读模式最终整合顺序缓存版：单滚动条、连续阅读、手选正文、字体/宽度调整、顺序缓存、导出 md/txt
 // @author       OpenAI
 // @match        http*://*/*
